@@ -1,14 +1,16 @@
 
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Upload, ArrowLeft } from "lucide-react";
+import { Upload, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { classifyImage, ClassificationResult } from "@/services/classificationService";
 
 const Classify = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<ClassificationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -18,6 +20,7 @@ const Classify = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setSelectedImage(e.target?.result as string);
+        setSelectedFile(file);
         setFileName(file.name);
         setResults(null);
       };
@@ -31,21 +34,39 @@ const Classify = () => {
     }
   };
 
-  const handlePredict = () => {
-    if (!selectedImage) return;
+  const handlePredict = async () => {
+    if (!selectedFile) return;
     
     setIsLoading(true);
-    // Simulate prediction
-    setTimeout(() => {
-      setResults({
-        prediction: "Arborio",
-        confidence: "high"
+    
+    try {
+      const result = await classifyImage(selectedFile);
+      
+      if (result.status === 'success') {
+        setResults(result);
+        toast({
+          title: "Classification Complete",
+          description: `Predicted rice type: ${result.prediction}`,
+        });
+      } else {
+        toast({
+          title: "Classification Failed",
+          description: result.error || "Failed to classify image",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to connect to classification service",
+        variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
-  if (results) {
+  if (results && results.status === 'success') {
     return (
       <div className="min-h-screen bg-gray-100">
         {/* Navigation */}
@@ -69,17 +90,28 @@ const Classify = () => {
           <div className="max-w-2xl mx-auto text-center">
             <h1 className="text-4xl font-bold text-gray-800 mb-8">Results</h1>
             <p className="text-lg text-gray-600 mb-4">
-              Based on the image given as input, the AI model has predicted that there is a high
+              Based on the image given as input, the AI model has predicted that there is a{' '}
+              <span className="font-semibold">
+                {results.confidence > 0.8 ? 'high' : results.confidence > 0.6 ? 'medium' : 'low'}
+              </span>
             </p>
             <p className="text-lg text-gray-600 mb-8">
               possibility for your rice is of type
             </p>
-            <h2 className="text-5xl font-bold text-orange-600 mb-12">
+            <h2 className="text-5xl font-bold text-orange-600 mb-4">
               {results.prediction}
             </h2>
+            <p className="text-lg text-gray-500 mb-12">
+              Confidence: {Math.round(results.confidence * 100)}%
+            </p>
             
             <Button 
-              onClick={() => setResults(null)}
+              onClick={() => {
+                setResults(null);
+                setSelectedImage(null);
+                setSelectedFile(null);
+                setFileName("");
+              }}
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
             >
               Predict Another
@@ -179,13 +211,20 @@ const Classify = () => {
                         className="max-w-full h-32 object-contain mx-auto"
                       />
                       <p className="text-sm text-gray-600">File: {fileName}</p>
-                      <p className="text-xs text-gray-500">Image type: JPG File</p>
+                      <p className="text-xs text-gray-500">Image type: {selectedFile?.type}</p>
                       <Button
                         onClick={handlePredict}
                         disabled={isLoading}
                         className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 mt-4"
                       >
-                        {isLoading ? "Processing..." : "Upload & Predict"}
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Upload & Predict"
+                        )}
                       </Button>
                     </div>
                   ) : (
