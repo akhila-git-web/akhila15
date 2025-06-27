@@ -9,6 +9,7 @@ const Classify = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [results, setResults] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -33,13 +34,15 @@ const Classify = () => {
   const handlePredict = () => {
     if (!selectedImage) return;
     
-    // Simulate prediction with rice.h5 model
+    setIsLoading(true);
+    // Simulate prediction
     setTimeout(() => {
       setResults({
-        prediction: "arborio",
+        prediction: "Arborio",
         confidence: "high"
       });
-    }, 1500);
+      setIsLoading(false);
+    }, 2000);
   };
 
   if (results) {
@@ -71,7 +74,7 @@ const Classify = () => {
             <p className="text-lg text-gray-600 mb-8">
               possibility for your rice is of type
             </p>
-            <h2 className="text-3xl font-bold text-orange-600 mb-12">
+            <h2 className="text-5xl font-bold text-orange-600 mb-12">
               {results.prediction}
             </h2>
             
@@ -108,12 +111,10 @@ const Classify = () => {
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-              <Link to="/" className="text-green-600 hover:text-green-700">Home</Link>
-              <span className="mx-2">/</span>
-              <span>Details Page</span>
-            </div>
+          <div className="text-sm text-gray-500">
+            <Link to="/" className="text-green-600 hover:text-green-700">Home</Link>
+            <span className="mx-2">/</span>
+            <span>Details Page</span>
           </div>
         </div>
       </div>
@@ -123,10 +124,10 @@ const Classify = () => {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="grid md:grid-cols-2 gap-8">
-              {/* Left Side - File Browser Simulation */}
+              {/* Left Side - File Browser */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Select Rice Image</h3>
-                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center min-h-[300px] flex flex-col justify-center">
                   {selectedImage ? (
                     <div className="space-y-4">
                       <img 
@@ -166,7 +167,7 @@ const Classify = () => {
                 />
               </div>
 
-              {/* Right Side - Upload Area */}
+              {/* Right Side - Preview Area */}
               <div>
                 <h3 className="text-lg font-semibold mb-4">Your Image</h3>
                 <div className="border-2 border-gray-300 rounded-lg p-8 text-center min-h-[300px] flex flex-col justify-center">
@@ -181,9 +182,10 @@ const Classify = () => {
                       <p className="text-xs text-gray-500">Image type: JPG File</p>
                       <Button
                         onClick={handlePredict}
+                        disabled={isLoading}
                         className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 mt-4"
                       >
-                        Upload & Predict
+                        {isLoading ? "Processing..." : "Upload & Predict"}
                       </Button>
                     </div>
                   ) : (
