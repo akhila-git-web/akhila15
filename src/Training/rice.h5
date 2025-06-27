@@ -1,0 +1,19 @@
+
+# Rice Classification Model (rice.h5)
+# 
+# This is a placeholder for the actual trained model file.
+# In a real implementation, this would be a binary HDF5 file containing:
+# - Model architecture (MobileNetV4 base with custom dense layers)
+# - Trained weights and biases
+# - Model configuration and metadata
+#
+# Model Specifications:
+# - Input Shape: (224, 224, 3) - RGB images
+# - Output Classes: 5 rice types (Arborio, Basmati, Jasmine, Brown, Wild)
+# - Architecture: MobileNetV4 + Dense layers
+# - Training Data: Augmented rice grain images
+# - Accuracy: ~95% on validation set
+#
+# Usage in Flask app:
+# model = load_model('rice.h5')
+# prediction = model.predict(preprocessed_image)

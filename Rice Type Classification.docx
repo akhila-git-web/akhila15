@@ -1,0 +1,48 @@
+
+# GrainPalette - Rice Type Classification Documentation
+
+## Project Overview
+GrainPalette is a deep learning application for rice type classification using transfer learning with MobileNetV4 architecture.
+
+## System Requirements
+- Windows 8 or higher
+- Two web browsers installed
+- Bandwidth: 30 Mbps minimum
+- Python 3.8+
+- TensorFlow 2.x
+- Flask framework
+
+## Model Architecture
+- Base Model: MobileNetV4
+- Transfer Learning: Pre-trained on ImageNet
+- Custom Dense Layers: Added for rice classification
+- Input Shape: 224x224x3 (RGB images)
+- Output Classes: 5 rice types
+
+## Rice Types Supported
+1. Arborio
+2. Basmati  
+3. Jasmine
+4. Brown Rice
+5. Wild Rice
+
+## Technical Implementation
+- Frontend: React with TypeScript
+- Backend: Flask Python application
+- Model: TensorFlow/Keras (rice.h5)
+- Image Processing: PIL/OpenCV
+- Data Augmentation: ImageDataGenerator
+
+## Usage Scenarios
+1. Farmers' Crop Planning
+2. Research and Agricultural Extension
+3. Home Gardening and Education
+
+## File Structure
+- /src/data/ - Training and validation datasets
+- /src/forms/ - Form components
+- /src/static/ - CSS and static assets  
+- /src/templates/ - HTML templates
+- /src/Training/ - Model files including rice.h5
+- app.py - Flask application
+- rice-classification.ipynb - Training notebook
